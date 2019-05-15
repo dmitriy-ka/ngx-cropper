@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 
 @Component({
+  // tslint:disable-next-line:component-selector
   selector: 'ngx-cropper',
   templateUrl: './ngx-cropper.component.html',
   styleUrls: ['./ngx-cropper.component.scss']

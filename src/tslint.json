@@ -1,17 +1,16 @@
 {
   "extends": "../tslint.json",
   "rules": {
-    "directive-selector": [
+    "directive-selector": [true, "attribute", "app", "camelCase"],
+    "component-selector": [true, "element", "app", "kebab-case"],
+    "no-submodule-imports": [
       true,
-      "attribute",
-      "app",
-      "camelCase"
-    ],
-    "component-selector": [
-      true,
-      "element",
-      "app",
-      "kebab-case"
+      "rxjs",
+      "@angular/platform-browser",
+      "@angular/core/testing",
+      "@angular/router/testing",
+      "@angular/platform-browser-dynamic/testing",
+      "zone.js/dist"
     ]
   }
 }
