@@ -17,9 +17,6 @@ export class NgxCropperComponent implements OnInit, OnChanges {
 
   @Input() format: 'png' | 'jpeg' = 'png';
   @Input() aspectRatio = 1;
-  get image(): boolean {
-    return this.originalImage;
-  }
 
   @Input()
   set fileChangedEvent(event: Event) {
@@ -46,6 +43,10 @@ export class NgxCropperComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     console.log({ changes });
+  }
+
+  get image(): boolean {
+    return this.originalImage;
   }
 
   private isFileValid(file) {
