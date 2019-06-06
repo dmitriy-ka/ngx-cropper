@@ -3,42 +3,40 @@ import {
   OnInit,
   Input,
   SimpleChanges,
-  OnChanges
+  OnChanges,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef
 } from '@angular/core';
 
 @Component({
-  // tslint:disable-next-line:component-selector
   selector: 'ngx-cropper',
   templateUrl: './ngx-cropper.component.html',
-  styleUrls: ['./ngx-cropper.component.scss']
+  styleUrls: ['./ngx-cropper.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class NgxCropperComponent implements OnInit, OnChanges {
   private originalImage: any;
   private originalBase64: string;
 
   @Input() format: 'png' | 'jpeg' = 'png';
-  @Input() aspectRatio = 1;
-
+  @Input() aspectRatio: number = 1;
   @Input()
   set fileChangedEvent(event: Event) {
-    if (
-      event &&
-      event.target &&
-      Array.isArray((event.target as HTMLInputElement).files) &&
-      (event.target as HTMLInputElement).files.length > 0
-    ) {
-      const file = (event.target as HTMLInputElement).files[0];
-      const isFileValid = this.isFileValid(file);
-      if (!isFileValid) {
+    const eventTarget: Partial<HTMLInputElement> = event ? event.target : null;
+    if (eventTarget && eventTarget.files && eventTarget.files.length > 0) {
+      const file = eventTarget.files[0];
+      if (!this.isFileValid(file)) {
         // TODO:
         return;
       }
-      this.originalImage = file;
       this.initialize(file);
     }
   }
 
-  constructor() {}
+  imageSrc;
+  showLoader: boolean = false;
+
+  constructor(private cdr: ChangeDetectorRef) {}
 
   ngOnInit() {}
 
@@ -55,6 +53,24 @@ export class NgxCropperComponent implements OnInit, OnChanges {
   }
 
   private initialize(file: any) {
-    // TODO: parse ratio
+    this.showLoader = true;
+    this.originalImage = file;
+
+    const reader = new FileReader();
+    reader.onload = (event: any) => {
+      this.imageSrc = event.target.result;
+      this.showLoader = false;
+      this.cdr.markForCheck();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  showCropArea() {
+    // TODO: calc ration
+  }
+
+  private clear() {
+    this.imageSrc = null;
+    this.originalImage = null;
   }
 }

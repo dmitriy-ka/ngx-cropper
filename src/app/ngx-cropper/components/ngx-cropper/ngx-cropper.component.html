@@ -1,7 +1,7 @@
-<p>
-  ngx-cropper works!
-</p>
-
-<div>
-  <!-- <img [src]="image" alt="" /> -->
+<div class="crop-container">
+  <div *ngIf="showLoader" id="loader"></div>
+  <div>
+    <img class="crop-image" #cropImage [src]="imageSrc" />
+    <div class="crop-area" #cropArea></div>
+  </div>
 </div>

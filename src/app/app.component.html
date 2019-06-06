@@ -1,7 +1,13 @@
-<h1>Hello world</h1>
-
-<input type="file" (change)="onChangeFile($event)" />
-
-<div>
-  <ngx-cropper [fileChangedEvent]="fileChangedEvent"> </ngx-cropper>
+<div class="container">
+  <div class="row">
+    <div class="col-6">
+      <label class="btn btn-primary">
+        Select file
+        <input [hidden]="true" type="file" (change)="onChangeFile($event)" />
+      </label>
+    </div>
+    <div class="col-6">
+      <ngx-cropper [fileChangedEvent]="fileChangedEvent"> </ngx-cropper>
+    </div>
+  </div>
 </div>
