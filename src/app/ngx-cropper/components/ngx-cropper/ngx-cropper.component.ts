@@ -108,10 +108,7 @@ export class NgxCropperComponent implements OnInit, OnChanges, OnDestroy {
   startMove(clickEvent, type: MoveType = 'move') {
     console.log('START MOVE', clickEvent);
     this.moveSubscription = fromEvent(document, 'mousemove')
-      .pipe(
-        debounceTime(50),
-        takeUntil(this.stopMove$)
-      )
+      .pipe(takeUntil(this.stopMove$))
       .subscribe((event: MouseEvent) => {
         this.moveCropper(clickEvent, event);
       });
