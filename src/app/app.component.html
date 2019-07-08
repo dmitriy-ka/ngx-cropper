@@ -1,13 +1,23 @@
-<div class="container">
-  <div class="row">
-    <div class="col-6">
+<div class="container mt-5">
+  <div class="row mt-5">
+    <div class="col-2">
       <label class="btn btn-primary">
         Select file
-        <input [hidden]="true" type="file" (change)="onChangeFile($event)" />
+        <input
+          [hidden]="true"
+          type="file"
+          (change)="onChangeFile($event)"
+          accept="image/jpeg,image/png,image/gif"
+        />
       </label>
     </div>
-    <div class="col-6">
-      <ngx-cropper [fileChangedEvent]="fileChangedEvent"> </ngx-cropper>
+    <div class="col-10">
+      <div class="card mt-5">
+        <div class="card-body">
+          <ngx-cropper [fileChangedEvent]="fileChangedEvent" [aspectRatio]="1">
+          </ngx-cropper>
+        </div>
+      </div>
     </div>
   </div>
 </div>

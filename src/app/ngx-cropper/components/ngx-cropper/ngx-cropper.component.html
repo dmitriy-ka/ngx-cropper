@@ -1,7 +1,22 @@
 <div class="crop-container">
   <div *ngIf="showLoader" id="loader"></div>
-  <div>
-    <img class="crop-image" #cropImage [src]="imageSrc" />
-    <div class="crop-area" #cropArea></div>
+  <div #cropArea>
+    <img class="crop-image" #cropImage [src]="imageSrc" (dragstart)="noop()" />
+    <div class="cropper" #cropper (dragstart)="noop()">
+      <div
+        class="cropper__rect"
+        (mousedown)="startMove($event, 'move')"
+        (dragstart)="noop()"
+      >
+        <span class="resize topleft"><span class="square"></span></span>
+        <span class="resize top"><span class="square"></span></span>
+        <span class="resize topright"><span class="square"></span></span>
+        <span class="resize right"><span class="square"></span></span>
+        <span class="resize bottomright"><span class="square"></span></span>
+        <span class="resize bottom"><span class="square"></span></span>
+        <span class="resize bottomleft"><span class="square"></span></span>
+        <span class="resize left"><span class="square"></span></span>
+      </div>
+    </div>
   </div>
 </div>

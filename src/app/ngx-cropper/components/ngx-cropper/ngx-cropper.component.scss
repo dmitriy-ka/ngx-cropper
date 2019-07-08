@@ -1,8 +1,40 @@
+$resize-size: 20px;
+$cropper-size: 80px;
+
+@mixin top () {
+    top: -$resize-size/2;
+}
+
+@mixin right () {
+    right: -$resize-size/2;
+}
+
+@mixin bottom () {
+    bottom: -$resize-size/2;
+}
+
+@mixin left () {
+    left: -$resize-size/2;
+}
+
+@mixin horizontal-center () {
+    left: calc(50% - #{$resize-size/2});
+}
+
+@mixin vertical-center () {
+    top: calc(50% - #{$resize-size/2});
+}
+
 :host {
+    * {
+        box-sizing: border-box;
+    }
+
     .crop-container {
         width: 100%;
         position: relative;
         overflow: hidden;
+        border: 1px solid red;
     }
 
     .crop-image {
@@ -12,21 +44,97 @@
         user-select: none;
     }
 
-    .crop-area {
+    .cropper {
         position: absolute;
         top: 50%;
         left: 50%;
         outline-color: rgba(247, 247, 247, 0.3);
         outline-width: 100vw;
-        width: 50px;
-        height: 50px;
+        width: $cropper-size;
+        height: $cropper-size;
         display: flex;
         color: #53535C;
         background: transparent;
         outline-style: solid;
         touch-action: none;
-        margin-left: -20px;
-        margin-top: -20px;
+        margin-left: $cropper-size - $cropper-size/2;
+        margin-top: $cropper-size - $cropper-size/2;
+    }
+
+    .cropper__rect {
+        position: relative;
+        width: 100%;
+        cursor: move;
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        z-index: 1;
+    }
+
+    .resize {
+        width: $resize-size;
+        height: $resize-size;
+        display: block;
+        position: absolute;
+        line-height: 6px;
+        padding: 6px;
+        opacity: .85;
+        z-index: 2;
+
+        &.topleft {
+            @include top ();
+            @include left ();
+            cursor: nwse-resize;
+        }
+
+        &.top {
+            @include top ();
+            @include horizontal-center();
+            cursor: row-resize;
+        }
+
+        &.topright {
+            @include top ();
+            @include right ();
+            cursor: nesw-resize;
+        }
+
+        &.right {
+            @include right ();
+            @include vertical-center();
+            cursor: col-resize;
+        }
+
+        &.bottomright {
+            @include bottom ();
+            @include right ();
+            cursor: nwse-resize;
+        }
+
+        &.bottom {
+            @include bottom ();
+            @include horizontal-center();
+            cursor: row-resize;
+        }
+
+        &.bottomleft {
+            @include left ();
+            @include bottom ();
+            cursor: nesw-resize;
+        }
+
+        &.left {
+            @include left ();
+            @include vertical-center();
+            cursor: col-resize;
+        }
+    }
+
+    .square {
+        display: inline-block;
+        background: #53535C;
+        width: 6px;
+        height: 6px;
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        box-sizing: content-box;
     }
 
     #loader {
