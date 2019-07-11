@@ -1,5 +1,5 @@
 $resize-size: 20px;
-$cropper-size: 80px;
+$cropper-size: 200px;
 
 @mixin top () {
     top: -$resize-size/2;
@@ -46,8 +46,8 @@ $cropper-size: 80px;
 
     .cropper {
         position: absolute;
-        top: 50%;
-        left: 50%;
+        top: calc(50% - #{$cropper-size} / 2);
+        left: calc(50% - #{$cropper-size} / 2);
         outline-color: rgba(247, 247, 247, 0.3);
         outline-width: 100vw;
         width: $cropper-size;
@@ -57,8 +57,6 @@ $cropper-size: 80px;
         background: transparent;
         outline-style: solid;
         touch-action: none;
-        margin-left: $cropper-size - $cropper-size/2;
-        margin-top: $cropper-size - $cropper-size/2;
     }
 
     .cropper__rect {
