@@ -1,7 +1,6 @@
 <div class="container mb-5">
-  <div class="row mb-5"></div>
   <div class="row mb-5">
-    <div class="col-4">
+    <div class="col-6">
       <label class="btn btn-primary">
         Select file
         <input
@@ -11,23 +10,21 @@
           accept="image/jpeg,image/png,image/gif"
         />
       </label>
-    </div>
-    <div class="col-8">
-      <div class="card mt-5">
-        <div class="card-body">
-          <ngx-cropper
-            [fileChangedEvent]="fileChangedEvent"
-            [aspectRatio]="1"
-            (imageCropped)="imageCropped($event)"
-          >
-          </ngx-cropper>
+      <div>
+        <div class="card mt-5">
+          <div class="card-body">
+            <ngx-cropper
+              [fileChangedEvent]="fileChangedEvent"
+              [aspectRatio]="1"
+              (imageCropped)="imageCropped($event)"
+            >
+            </ngx-cropper>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  <div class="row">
-    <div class="col">
-      <img class="img-fluid" [src]="imageSrc" alt="" />
+    <div class="col-6">
+      <!-- <img class="img-fluid" [src]="imageSrc" alt="" /> -->
     </div>
   </div>
 </div>

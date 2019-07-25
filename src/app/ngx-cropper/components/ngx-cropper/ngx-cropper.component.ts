@@ -17,6 +17,7 @@ import {
 } from '@angular/core';
 import { Subscription, fromEvent, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { cropImage, downloadImage } from '../../utils/utils';
 
 @Component({
   selector: 'ngx-cropper',
@@ -30,7 +31,7 @@ export class NgxCropperComponent implements OnInit, OnChanges, OnDestroy {
   @ViewChild('cropper') cropper: ElementRef;
   @ViewChild('cropperDragElement') cropperDragElement: ElementRef;
 
-  @Input() format: 'png' | 'jpeg' = 'png';
+  @Input() format: Format = 'png';
   @Input() downloadFileName = 'image';
   @Input()
   set quality(value) {
@@ -78,19 +79,17 @@ export class NgxCropperComponent implements OnInit, OnChanges, OnDestroy {
     height: 0
   };
   private originalBase64: any;
+  private outputImage: any;
   private canvas: HTMLCanvasElement;
   private _ratio: number;
   private _quality: number;
 
-  private dragging$: Subscription;
+  private dragging$: Subject<boolean> = new Subject();
+  private subscription$: Subscription = new Subscription();
   private stopMove$: Subject<boolean> = new Subject();
   private onDestroy$: Subject<any> = new Subject();
 
   showLoader = false;
-
-  @HostListener('document:mouseup') clearListeners(event) {
-    this.stopMove$.next(true);
-  }
 
   get imageSrc(): string {
     if (this.originalImage) {
@@ -104,13 +103,7 @@ export class NgxCropperComponent implements OnInit, OnChanges, OnDestroy {
     private ngZone: NgZone
   ) {}
 
-  ngOnInit() {
-    this.stopMove$.pipe(takeUntil(this.onDestroy$)).subscribe(res => {
-      if (this.dragging$) {
-        this.crop();
-      }
-    });
-  }
+  ngOnInit() {}
 
   ngOnChanges(changes: SimpleChanges): void {}
 
@@ -123,59 +116,73 @@ export class NgxCropperComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   dragCropper(clickEvent, type: MoveType = 'move') {
+    this.dragging$.next(true);
     if (clickEvent.srcElement !== this.cropperDragElement.nativeElement) {
       return;
     }
-    this.dragging$ = fromEvent(document, 'mousemove')
-      .pipe(takeUntil(this.stopMove$))
-      .subscribe((event: MouseEvent) => {
+
+    const stopDragging = fromEvent(document, 'mouseup').pipe(
+      takeUntil(this.dragging$)
+    );
+    const dragging = fromEvent(document, 'mousemove').pipe(
+      takeUntil(stopDragging)
+    );
+    this.subscription$.add(
+      stopDragging.pipe(takeUntil(this.onDestroy$)).subscribe(res => {
+        this.crop();
+      })
+    );
+
+    this.subscription$.add(
+      dragging.subscribe((event: MouseEvent) => {
         this.moveCropper(clickEvent, event);
-      });
+      })
+    );
   }
 
   crop() {
-    this.ngZone.runOutsideAngular(() => {
-      const {
-        offsetLeft,
-        offsetTop,
-        offsetWidth,
-        offsetHeight
-      } = this.cropper.nativeElement;
+    const {
+      offsetLeft,
+      offsetTop,
+      offsetWidth,
+      offsetHeight
+    } = this.cropper.nativeElement;
 
-      // Ratio between original image size and cropArea size
-      const ratio =
-        this.originalSize.width / this.cropArea.nativeElement.clientWidth;
+    // Ratio between original image size and cropArea size
+    const ratio =
+      this.originalSize.width / this.cropArea.nativeElement.clientWidth;
 
-      const canvas = document.createElement('canvas');
-      canvas.width = offsetWidth * ratio;
-      canvas.height = offsetHeight * ratio;
+    const canvas = document.createElement('canvas');
+    canvas.width = offsetWidth * ratio;
+    canvas.height = offsetHeight * ratio;
 
-      canvas
-        .getContext('2d')
-        .drawImage(
-          this.originalImage,
-          offsetLeft * ratio,
-          offsetTop * ratio,
-          offsetWidth * ratio,
-          offsetHeight * ratio,
-          0,
-          0,
-          canvas.width,
-          canvas.height
-        );
+    canvas
+      .getContext('2d')
+      .drawImage(
+        this.originalImage,
+        offsetLeft * ratio,
+        offsetTop * ratio,
+        offsetWidth * ratio,
+        offsetHeight * ratio,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      );
+    this.canvas = canvas;
 
-      this.ngZone.run(() => {
-        this.canvas = canvas;
-        this.imageCropped.emit(canvas.toDataURL('image/png', this.quality));
+    cropImage(canvas, `image/${this.format}`, this.quality)
+      .then(res => {
+        this.outputImage = res;
+        this.imageCropped.emit(res);
+      })
+      .catch(err => {
+        console.log({ err });
       });
-    });
   }
 
   downloadImage() {
-    const link = document.createElement('a');
-    link.href = this.canvas.toDataURL();
-    link.download = `${this.downloadFileName}.${this.format}`;
-    link.click();
+    downloadImage(this.canvas, this.format, this.quality);
   }
 
   noop(event?: MouseEvent) {
@@ -188,7 +195,6 @@ export class NgxCropperComponent implements OnInit, OnChanges, OnDestroy {
 
   private initCropper(file: any) {
     this.showLoader = true;
-
     const reader = new FileReader();
     reader.onload = (event: ProgressEvent) => {
       this.showLoader = false;
@@ -264,6 +270,8 @@ export class NgxCropperComponent implements OnInit, OnChanges, OnDestroy {
 }
 
 export type MoveType = 'move' | 'resize';
+
+export type Format = 'png' | 'jpeg';
 
 export interface Dimensions {
   width: number;
